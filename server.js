@@ -11,7 +11,7 @@ http.createServer(async (req, res) => {
     await pool.query("INSERT INTO visits DEFAULT VALUES");
     const { rows } = await pool.query("SELECT count(*)::int AS total FROM visits");
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-    res.end(`<h1>fluxo 2 · ${version}</h1><p>visitas gravadas no Postgres: ${rows[0].total}</p>`);
+    res.end(`<h1>fluxo 4 · ${version}</h1><p>visitas gravadas no Postgres: ${rows[0].total}</p>`);
   } catch (error) {
     console.error("erro:", error.message);
     res.writeHead(500); res.end("erro: " + error.message);
