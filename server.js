@@ -2,6 +2,7 @@ const http = require("http");
 const { Pool } = require("pg");
 const port = Number(process.env.PORT || 3000);
 const version = process.env.APP_VERSION || "v1";
+if (!process.env.CHAVE_DA_API) { console.error("faltou a variável CHAVE_DA_API"); process.exit(1); }
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 http.createServer(async (req, res) => {
   try {
