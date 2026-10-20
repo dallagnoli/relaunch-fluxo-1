@@ -1,8 +1,17 @@
 const http = require("http");
+const { Pool } = require("pg");
 const port = Number(process.env.PORT || 3000);
 const version = process.env.APP_VERSION || "v1";
-http.createServer((req, res) => {
-  if (req.url === "/health") { res.writeHead(200, { "content-type": "text/plain" }); return res.end("ok"); }
-  res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-  res.end(`<h1>fluxo 1 · ${version}</h1><p>ReLaunch, deploy pelo GitHub App. Terceiro commit: logs sem repetição.</p>`);
-}).listen(port, "::", () => console.log(`fluxo 1 ${version} na porta ${port}`));
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+http.createServer(async (req, res) => {
+  try {
+    if (req.url === "/health") { await pool.query("SELECT 1"); res.writeHead(200); return res.end("ok"); }
+    await pool.query("INSERT INTO visits DEFAULT VALUES");
+    const { rows } = await pool.query("SELECT count(*)::int AS total FROM visits");
+    res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+    res.end(`<h1>fluxo 2 · ${version}</h1><p>visitas gravadas no Postgres: ${rows[0].total}</p>`);
+  } catch (error) {
+    console.error("erro:", error.message);
+    res.writeHead(500); res.end("erro: " + error.message);
+  }
+}).listen(port, "::", () => console.log(`fluxo 2 ${version} na porta ${port}`));
