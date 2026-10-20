@@ -36,8 +36,12 @@ http.createServer(async (req, res) => {
     const { rows } = await pool.query("SELECT count(*)::int AS total FROM visits");
     const redis = await redisIncr().catch((error) => `erro: ${error.message}`);
     const greeting = process.env.SAUDACAO || "sem saudação";
+    // Fluxo 7: o que o job agendado gravou (a tabela nasce na primeira execução).
+    const cron = await pool.query("SELECT count(*)::int AS total, max(at) AS last FROM cron_runs")
+      .then(({ rows: [run] }) => run.total ? `${run.total}, a última às ${run.last.toISOString()}` : "nenhuma")
+      .catch(() => "nenhuma");
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-    res.end(`<h1>fluxo 2 · ${version}</h1><p>${greeting}</p><p>visitas gravadas no Postgres: ${rows[0].total}</p><p>contador no Redis: ${redis ?? "sem Redis"}</p>`);
+    res.end(`<h1>fluxo 2 · ${version}</h1><p>${greeting}</p><p>visitas gravadas no Postgres: ${rows[0].total}</p><p>contador no Redis: ${redis ?? "sem Redis"}</p><p>execuções do cron: ${cron}</p>`);
   } catch (error) {
     console.error("erro:", error.message);
     res.writeHead(500); res.end("erro: " + error.message);
