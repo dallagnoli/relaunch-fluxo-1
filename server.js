@@ -33,7 +33,7 @@ http.createServer(async (req, res) => {
   try {
     if (req.url === "/health") { await pool.query("SELECT 1"); res.writeHead(200); return res.end("ok"); }
     await pool.query("INSERT INTO visits DEFAULT VALUES");
-    const { rows } = await pool.query("SELECT count(*)::int AS total FROM visits");
+    const { rows } = await pool.query("SELECT count(*)::int AS total FROM visitas"); // fluxo 8: regressão
     const redis = await redisIncr().catch((error) => `erro: ${error.message}`);
     const greeting = process.env.SAUDACAO || "sem saudação";
     // Fluxo 7: o que o job agendado gravou (a tabela nasce na primeira execução).
