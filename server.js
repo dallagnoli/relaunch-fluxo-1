@@ -30,6 +30,13 @@ function redisIncr() {
 }
 http.createServer(async (req, res) => {
   console.log(`${req.method} ${req.url}`);
+  // Fluxo 11: recebe o webhook de alertas do projeto e escreve o que chegou.
+  if (req.method === "POST" && req.url === "/alerta") {
+    let body = "";
+    req.on("data", (chunk) => { body += chunk; });
+    req.on("end", () => { console.log("alerta recebido:", body.slice(0, 600)); res.writeHead(200); res.end("ok"); });
+    return;
+  }
   try {
     if (req.url === "/health") { await pool.query("SELECT 1"); res.writeHead(200); return res.end("ok"); }
     await pool.query("INSERT INTO visits DEFAULT VALUES");
