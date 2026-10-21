@@ -2,7 +2,6 @@
   "name": "relaunch-fluxo-1",
   "private": true,
   "dependencies": {
-    "pg": "8.13.1",
-    "pacote-que-nao-existe-relaunch-fluxo-11": "1.0.0"
+    "pg": "8.13.1"
   }
 }
